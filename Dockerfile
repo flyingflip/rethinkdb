@@ -18,18 +18,22 @@ RUN apt-get update && \
   libssl-dev \
   clang \
   python \
+  python3-pip \
   make \
   patch
 
-COPY rethinkdb-2.4.1.tar.gz /rethinkdb.tar.gz
-RUN cd / && tar xf rethinkdb.tar.gz && \
-  cd rethinkdb-2.4.1 && \
+COPY rethinkdb-2.4.2.tgz /rethinkdb.tgz
+RUN cd / && tar xf rethinkdb.tgz && \
+  cd rethinkdb-2.4.2 && \
   ./configure --allow-fetch CXX=clang++ && \
   make install
 
+# Install Python Library for backup processes
+RUN pip install rethinkdb
+
 # Clean up our source code
-RUN cd / && rm -rf rethinkdb-2.4.1
-RUN cd / && rm rethinkdb-2.4.1.tar.gz
+RUN cd / && rm -rf rethinkdb-2.4.2
+RUN cd / && rm rethinkdb.tgz
 
 VOLUME ["/data"]
 
