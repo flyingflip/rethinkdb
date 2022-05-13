@@ -22,14 +22,14 @@ RUN apt-get update && \
   make \
   patch
 
+# Install Python Library for backup processes
+RUN pip install rethinkdb
+
 COPY rethinkdb-2.4.2.tgz /rethinkdb.tgz
 RUN cd / && tar xf rethinkdb.tgz && \
   cd rethinkdb-2.4.2 && \
   ./configure --allow-fetch CXX=clang++ && \
   make install
-
-# Install Python Library for backup processes
-RUN pip install rethinkdb
 
 # Clean up our source code
 RUN cd / && rm -rf rethinkdb-2.4.2
