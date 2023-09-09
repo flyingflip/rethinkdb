@@ -1,11 +1,18 @@
+# Supported tags and respective `Dockerfile` links
+
+- `arm`
+- `amd` `latest`
+
+**Current Version: 2.4.3**
+
 # What is RethinkDB?
 
 RethinkDB is an open-source, distributed database built to store JSON documents and effortlessly scale to multiple machines. It's easy to set up and learn and features a simple but powerful query language that supports table joins, groupings, aggregations, and functions.
 
 # How to use this image
-Keeping in mind that this image is syntactically compatible with the main [RethinkDB](https://www.rethinkdb.com) image, it is largely the same and follows the compiling instructions for RaspberryPi. It is compiled on an Apple MacBook Air running an Apple Silicon M1 processor but is compiled for AMD/X86 as well as ARM architectures.   
+Keeping in mind that this image is syntactically compatible with the main [RethinkDB](https://www.rethinkdb.com) image, it is largely the same and follows the compiling instructions for RaspberryPi. In addition to the RethinkDB server, it also includes the pyton based tools for backing up database, exporting and importing data. It is built on Ubuntu 22.04 LTS. I had to move away from Alpine due to shifting priorities on dependent packages needed to compile the code.
 
-As such, I have used most of the README and all of the instructions from [RethinkDB's DockerHub](https://hub.docker.com/_/rethinkdb) page. ARM support is still considered experimental - so use at your own discretion.  
+I have used most of the README and all of the instructions from [RethinkDB's DockerHub](https://hub.docker.com/_/rethinkdb) page. ARM support is still considered experimental - so use at your own discretion.  
 
 **One addition to this image is the inclusion of the python libraries not present in the official images so you can do backup and restores of databases.**  
 
