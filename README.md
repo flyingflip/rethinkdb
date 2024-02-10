@@ -1,16 +1,23 @@
+# Quick reference
+Maintained by: [FlyingFlip Studios, LLC](https:www.flyingflip.com)  
+
+Official Web Site: [RethinkDB](https://www.rethinkdb.com)
+
+
 # Supported tags and respective `Dockerfile` links
 
-- `arm`
-- `amd` `latest`
+- `2.4.1-arm`, `2.4.2-arm`, `2.4.3-arm`, `2.4.4-arm`
+- `2.4.1-amd`, `2.4.2-amd`, `2.4.3-amd`, `2.4.4-amd`
+- `latest` - The latest version on AMD processor
 
-**Current Version: 2.4.3**
+**Current Version: 2.4.4**
 
 # What is RethinkDB?
 
 RethinkDB is an open-source, distributed database built to store JSON documents and effortlessly scale to multiple machines. It's easy to set up and learn and features a simple but powerful query language that supports table joins, groupings, aggregations, and functions.
 
 # How to use this image
-Keeping in mind that this image is syntactically compatible with the main [RethinkDB](https://www.rethinkdb.com) image, it is largely the same and follows the compiling instructions for RaspberryPi. In addition to the RethinkDB server, it also includes the pyton based tools for backing up database, exporting and importing data. It is built on Ubuntu 22.04 LTS. I had to move away from Alpine due to shifting priorities on dependent packages needed to compile the code.
+Keeping in mind that this image is syntactically compatible with the main [RethinkDB](https://www.rethinkdb.com) image, it is largely the same and follows the compiling instructions for RaspberryPi. In addition to the RethinkDB server, it also includes the pyton based tools for backing up database, exporting and importing data. It is built on Ubuntu. I had to move away from Alpine due to shifting priorities on dependent packages needed to compile the code.
 
 I have used most of the README and all of the instructions from [RethinkDB's DockerHub](https://hub.docker.com/_/rethinkdb) page. ARM support is still considered experimental - so use at your own discretion.  
 
@@ -21,36 +28,38 @@ I have used most of the README and all of the instructions from [RethinkDB's Doc
 The default CMD of the image is  `rethinkdb --bind all`, so the RethinkDB daemon will bind to all network interfaces available to the container (by default, RethinkDB only accepts connections from  `localhost`).
 
 ```
-docker run --name some-rethink -v "$PWD:/data" -d mbagnall/rethinkdb
+docker run --name rethinkdb -p8080:8080 -d -v "$PWD:/data" -d flyingflip/rethinkdb
+```
+## docker-compose.yml example using network mode
+
+```yml
+version: '3'
+services:
+  rethinkdb:
+    image: flyingflip/rethinkdb
+    container_name: rethinkdb
+    volumes:
+      - ./data:/data
+    network_mode: host
+    restart: unless-stopped
 ```
 
-## Connect the instance to an application
-
-```
-docker run --name some-app --link some-rethink:rdb -d application-that-uses-rdb
-```
-
-## Connecting to the web admin interface on the same host
-
-```
-$BROWSER "http://$(docker inspect --format \
-  '{{ .NetworkSettings.IPAddress }}' some-rethink):8080"
-```
-
-# Connecting to the web admin interface on a remote / virtual host via SSH
-
-Where  `remote`  is an alias for the remote user@hostname:
-
-```
-# start port forwarding
-ssh -fNTL localhost:8080:$(ssh remote "docker inspect --format \
-  '{{ .NetworkSettings.IPAddress }}' some-rethink"):8080 remote
-
-# open interface in browser
-xdg-open http://localhost:8080
-
-# stop port forwarding
-kill $(lsof -t -i @localhost:8080 -sTCP:listen)
+## docker-compose.yml example with port mapping
+```yml
+version: '3'
+services:
+  rethinkdb:
+    image: flyingflip/rethinkdb
+    container_name: rethinkdb
+    volumes:
+      - ./data:/data
+    ports:
+      - "8080:8080"
+    networks:
+      - rethinkdb
+    restart: unless-stopped
+network:
+  rethinkdb: null
 ```
 
 ## Configuration
