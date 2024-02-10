@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 # Set our our meta data for this container.
 LABEL name="RethinkDB Container with Tools"
@@ -8,22 +8,22 @@ LABEL vendor="FlyingFlip Studios, LLC."
 # Install dependencies for compiling RethinkDB
 RUN DEBIAN_FRONTEND=noninteractive apt update -y && apt upgrade -y && \
   apt install -y build-essential protobuf-compiler \
-  python2 python-is-python2 pip clang wget \
+  python3 python-is-python3 pip clang wget \
   libprotobuf-dev libcurl4-openssl-dev \
   libncurses5-dev libjemalloc-dev wget m4 g++ libssl-dev
 
 # Install Python Library for backup processes
 RUN pip install rethinkdb
 
-RUN wget https://mbagnall.s3.amazonaws.com/rethinkdb-2.4.1.tgz && \
-  tar -xzf rethinkdb-2.4.1.tgz && \
-  cd rethinkdb-2.4.1 && \
+RUN wget https://mbagnall.s3.amazonaws.com/rethinkdb-2.4.4.tgz && \
+  tar -xzf rethinkdb-2.4.4.tgz && \
+  cd rethinkdb-2.4.4 && \
   ./configure --prefix=/opt --allow-fetch CXX=clang++ && \
   make -j4 && \
   make install && \
   cd /root && \
-  rm -rf rethinkdb-2.4.1 && \
-  rm -rf rethinkdb-2.4.1.tgz
+  rm -rf rethinkdb-2.4.4 && \
+  rm -rf rethinkdb-2.4.4.tgz
 
 VOLUME ["/data"]
 
