@@ -1,6 +1,6 @@
 # Quick reference
-Maintained by: [FlyingFlip Studios, LLC](https:www.flyingflip.com)  
-
+Maintained by: [FlyingFlip Studios, LLC](https://www.flyingflip.com)  
+x
 Official Web Site: [RethinkDB](https://www.rethinkdb.com)
 
 
