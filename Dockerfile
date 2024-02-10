@@ -15,15 +15,15 @@ RUN DEBIAN_FRONTEND=noninteractive apt update -y && apt upgrade -y && \
 # Install Python Library for backup processes
 RUN pip install rethinkdb
 
-RUN wget https://mbagnall.s3.amazonaws.com/rethinkdb-2.4.4.tgz && \
-  tar -xzf rethinkdb-2.4.4.tgz && \
-  cd rethinkdb-2.4.4 && \
+RUN wget https://mbagnall.s3.amazonaws.com/rethinkdb-2.4.2.tgz && \
+  tar -xzf rethinkdb-2.4.2.tgz && \
+  cd rethinkdb-2.4.2 && \
   ./configure --prefix=/opt --allow-fetch CXX=clang++ && \
   make -j4 && \
   make install && \
   cd /root && \
-  rm -rf rethinkdb-2.4.4 && \
-  rm -rf rethinkdb-2.4.4.tgz
+  rm -rf rethinkdb-2.4.2 && \
+  rm -rf rethinkdb-2.4.2.tgz
 
 VOLUME ["/data"]
 
