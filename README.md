@@ -17,7 +17,7 @@ Official Web Site: [RethinkDB](https://www.rethinkdb.com)
 RethinkDB is an open-source, distributed database built to store JSON documents and effortlessly scale to multiple machines. It's easy to set up and learn and features a simple but powerful query language that supports table joins, groupings, aggregations, and functions.
 
 # How to use this image
-Keeping in mind that this image is syntactically compatible with the main [RethinkDB](https://www.rethinkdb.com) image, it is largely the same and follows the compiling instructions for RaspberryPi. In addition to the RethinkDB server, it also includes the pyton based tools for backing up database, exporting and importing data. It is built on Ubuntu. I had to move away from Alpine due to shifting priorities on dependent packages needed to compile the code.
+Keeping in mind that this image is syntactically compatible with the main [RethinkDB](https://www.rethinkdb.com) image, it is largely the same and follows the compiling instructions for RaspberryPi. In addition to the RethinkDB server, it also includes the python based tools for backing up database, exporting and importing data. It is built on Alpine Linux 3.22, with RethinkDB compiled from source using clang++ against musl.
 
 I have used most of the README and all of the instructions from [RethinkDB's DockerHub](https://hub.docker.com/_/rethinkdb) page. ARM support is still considered experimental - so use at your own discretion.  
 
@@ -65,6 +65,47 @@ network:
 ## Configuration
 
 See the  [official docs](http://www.rethinkdb.com/docs/)  for infomation on using and configuring a RethinkDB cluster.
+
+# Building the image
+
+The `Dockerfile` is architecture-neutral, so the same file builds both `arm64` and `amd64`. RethinkDB is compiled from source during the build, so expect it to take a while.
+
+## One tag for both architectures
+
+Use `docker buildx` to build both platforms in a single command and push them under one tag. Docker publishes the result as a manifest list, and clients automatically pull the image that matches their CPU.
+
+```
+docker buildx build \
+  --platform linux/amd64,linux/arm64 \
+  -t flyingflip/rethinkdb:2.4.4 \
+  -t flyingflip/rethinkdb:latest \
+  --push .
+```
+
+Notes:
+
+- `--push` is required for the multi-platform result. Add `--load` as well if you want a local copy, which needs Docker's containerd image store enabled (on by default in recent Docker Desktop releases). If your builder does not support multi-platform builds, create one first with `docker buildx create --use`.
+- Whichever architecture does not match your host is built under QEMU emulation, which is several times slower than a native build. On an Apple Silicon Mac, the `arm64` half takes around 5 minutes and the emulated `amd64` half around 20 minutes.
+- RethinkDB's `amd64` binary hangs at startup when run under Docker Desktop's emulation on Apple Silicon. This is true of the official `rethinkdb` image as well and is not a build problem. Test the `amd64` image on a real `amd64` host.
+
+## Building each architecture natively
+
+If emulation is too slow, build each architecture on its own machine, push them as separate tags, and then combine them into a single tag:
+
+```
+# On an arm64 host
+docker build -t flyingflip/rethinkdb:2.4.4-arm . && docker push flyingflip/rethinkdb:2.4.4-arm
+
+# On an amd64 host
+docker build -t flyingflip/rethinkdb:2.4.4-amd . && docker push flyingflip/rethinkdb:2.4.4-amd
+
+# From anywhere, once both are pushed
+docker buildx imagetools create -t flyingflip/rethinkdb:2.4.4 \
+  flyingflip/rethinkdb:2.4.4-amd \
+  flyingflip/rethinkdb:2.4.4-arm
+```
+
+This produces the same multi-architecture tag as the single-command build and keeps the per-architecture tags available.
 
 # License
 
